@@ -12,6 +12,7 @@ import com.adobe.marketing.mobile.Analytics;
 import com.adobe.marketing.mobile.Griffon;
 import com.adobe.marketing.mobile.Places;
 import com.adobe.marketing.mobile.PlacesMonitor;
+import com.adobe.marketing.mobile.TargetParameters;
 import com.adobe.marketing.mobile.TargetRequest;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -49,6 +50,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -70,8 +73,8 @@ public class MainActivity extends AppCompatActivity {
             MobileCore.start(new AdobeCallback() {
                 @Override
                 public void call(Object o) {
-                    //MobileCore.configureWithAppID("4fa03d1212c6/47085f890555/launch-9e0c6e9e5482");
-                    MobileCore.configureWithAppID("2d6d124a9338/2a263dab1ce3/launch-d8b67b854e8a-development");
+                    MobileCore.configureWithAppID("4fa03d1212c6/47085f890555/launch-9e0c6e9e5482"); //Xerago configureWithAppID
+                    //MobileCore.configureWithAppID("2d6d124a9338/2a263dab1ce3/launch-d8b67b854e8a-development"); //BFL configureWithAppID
                 }
             });
         } catch (InvalidInitException e) {
@@ -99,9 +102,28 @@ public class MainActivity extends AppCompatActivity {
                 MobileCore.trackAction("Add to Cart Targeting Button tapped", null);
                 // now over to Target
                 Snackbar.make(view, "Creating Add to Cart Target request.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                TargetRequest targetRequest1 = new TargetRequest("target-global-mbox-app", null
-                        , "{\"color\":\"#000000\""
+
+                Map<String, String> profileParameters1 = new HashMap<>();
+                //profileParameters1.put("usertype", "ETB"); // Does not NTB user Android offer display
+                profileParameters1.put("usertype", "NTB"); // Iphone offer display
+                TargetParameters ProfileParametersTest = new TargetParameters.Builder().profileParameters(profileParameters1).build();
+
+                TargetRequest targetRequest1 = new TargetRequest("target-global-mbox-applemobile", ProfileParametersTest
+                        , "{\"productname\":\"Welcome!\",\"productprice\":\"1000rs\",\"productdescription\":\"lorum imposum\",\"productimage\":\"https://www.image.com/\""
                         , new AdobeCallback<String>() {
+             /*      @Override
+                    public void call(String content) {
+                        if(content !=null && !content.isEmpty()){
+                            Snackbar.make(view, content, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+
+// imageUrl now contains the URL string "https///demo"
+// You can use this URL to download and display the image as shown in the previous answer
+                            } else {
+// The regular expression didn't match the src attribute
+// Handle the error condition here
+                            }
+                        }
+*/
                     @Override
                     public void call(String jsonResponse) {
                         Snackbar.make(view, "Content received", Snackbar.LENGTH_LONG).setAction("Action", null).show();
@@ -109,15 +131,14 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             JSONObject targetJSONResponse = new JSONObject(jsonResponse);
                             // replace content as needed
-                            final String textForTextView1 = targetJSONResponse.getString("color");
+                            final String textForTextView1 = targetJSONResponse.getString("productname");
                             final TextView textView1 = findViewById(R.id.productname);
-
-                            //final String textForTextView2 = targetJSONResponse.getString("productprice");
-                           // final TextView textView2 = findViewById(R.id.productprice);
-                          //  final String textForTextView3 = targetJSONResponse.getString("productdescription");
-                          //  final TextView textView3 = findViewById(R.id.productdescription);
-                          //  final String ProductImagePath = targetJSONResponse.getString("productimage");
-                           // final ImageView imageView1 = findViewById(R.id.productimage);
+                            final String textForTextView2 = targetJSONResponse.getString("productprice");
+                            final TextView textView2 = findViewById(R.id.productprice);
+                            final String textForTextView3 = targetJSONResponse.getString("productdescription");
+                            final TextView textView3 = findViewById(R.id.productdescription);
+                            final String ProductImagePath = targetJSONResponse.getString("productimage");
+                            final ImageView imageView1 = findViewById(R.id.productimage);
 
                             if (textForTextView1.length() > 0) {
                                 runOnUiThread(new Runnable() {
@@ -127,14 +148,14 @@ public class MainActivity extends AppCompatActivity {
                                         // imageView1.setDrawingCacheEnabled(true);//App local image value replacing method
                                         // imageView1.buildDrawingCache(true); //App local image value replacing method
                                         textView1.setText(textForTextView1);
-                                        //textView2.setText(textForTextView2);
-                                       // textView3.setText(textForTextView3);
-                                       // Picasso.get().load(ProductImagePath).into(imageView1); // Live public url image value replacing method
+                                        textView2.setText(textForTextView2);
+                                        textView3.setText(textForTextView3);
+                                        Picasso.get().load(ProductImagePath).into(imageView1); // Live public url image value replacing method
 
-                                       // Resources res = getResources(); //App local image value replacing method
-                                       // int resourceId = res.getIdentifier(ProductImagePath, "url", getPackageName() ); //App local image value replacing method
-                                       // imageView1.getDrawingCache(); //App local image value replacing method
-                                       // imageView1.setImageResource(resourceId); //App local image value replacing method
+                                        // Resources res = getResources(); //App local image value replacing method
+                                        // int resourceId = res.getIdentifier(ProductImagePath, "url", getPackageName() ); //App local image value replacing method
+                                        // imageView1.getDrawingCache(); //App local image value replacing method
+                                        // imageView1.setImageResource(resourceId); //App local image value replacing method
 
                                         Snackbar.make(view, "Content replaced", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                                     }
@@ -149,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                 requests.add(targetRequest1);
                 // prep done, now retrieve content
                 Snackbar.make(view, "Retrieving content from Target", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                Target.retrieveLocationContent(requests, null);
+                Target.retrieveLocationContent(requests, ProfileParametersTest);
             }
         });
         // ATTENTION: This was auto-generated to handle app links.
@@ -159,12 +180,8 @@ public class MainActivity extends AppCompatActivity {
 
 //-------------- Add to Cart Button Target Activity code End -------------------//
 
-
-
-
 //******************* Click Here Button Target Activity code Start ********************//
-
-/*
+        /*
         Button ClickHereBtn = findViewById(R.id.ClickHereBtn);
         ClickHereBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                 MobileCore.trackAction("Click Here Targeting Button tapped", null);
                 // now over to Target
                 Snackbar.make(view, "Creating Click Here Target request.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                TargetRequest targetRequest2 = new TargetRequest("target-global-mbox-applemobile", null
+                TargetRequest targetRequest1 = new TargetRequest("target-global-mbox-applemobile", null
                         , "{\"productname\":\"Welcome!\",\"productprice\":\"1000rs\",\"productdescription\":\"lorum imposum\",\"productimage\":\"https://www.image.com/\""
                         , new AdobeCallback<String>() {
                     @Override
@@ -219,14 +236,20 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 List<TargetRequest> requests = new ArrayList<>();
-                requests.add(targetRequest2);
+                requests.add(targetRequest1);
                 // prep done, now retrieve content
                 Snackbar.make(view, "Retrieving content from Target", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 Target.retrieveLocationContent(requests, null);
             }
         });
-*/
+
+        // ATTENTION: This was auto-generated to handle app links.
+        Intent appLinkIntent = getIntent();
+        String appLinkAction = appLinkIntent.getAction();
+        Uri appLinkData = appLinkIntent.getData();
+   */
         //******************* Click Here Button Target Activity code End ********************//
+
     }
 
     @Override
