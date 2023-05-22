@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
     defaultConfig {
         applicationId "com.xeragoadobetargetapp"
         minSdkVersion 25
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -37,7 +37,10 @@ dependencies {
     implementation 'com.adobe.marketing.mobile:analytics:1.+'
     implementation 'com.adobe.marketing.mobile:target:1.+'
     implementation 'com.adobe.marketing.mobile:userprofile:1.+'
-    implementation 'com.adobe.marketing.mobile:sdk-core:1.+'
+    implementation 'com.adobe.marketing.mobile:core:1.+'
+    implementation 'com.adobe.marketing.mobile:identity:1.+'
+    implementation 'com.adobe.marketing.mobile:lifecycle:1.+'
+    implementation 'com.adobe.marketing.mobile:signal:1.+'
     implementation 'com.squareup.picasso:picasso:2.8'
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 }

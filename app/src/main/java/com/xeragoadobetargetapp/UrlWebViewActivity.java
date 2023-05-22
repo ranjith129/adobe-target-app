@@ -44,7 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class UrlWebViewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -255,34 +255,67 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(final View view) {
                 // track this into Analytics
-                final TextView textView1 = findViewById(R.id.productname);
-                final TextView textView2 = findViewById(R.id.productprice);
-                final TextView textView3 = findViewById(R.id.productdescription);
-                final ImageView imageView1 = findViewById(R.id.productimage);
-                Button AddtoCart = findViewById(R.id.AddtoCart);
-                Button ClickHereBtn = findViewById(R.id.ClickHereBtn);
-                textView1.setVisibility(View.INVISIBLE);
-                textView2.setVisibility(View.INVISIBLE);
-                textView3.setVisibility(View.INVISIBLE);
-                imageView1.setVisibility(View.INVISIBLE);
-                AddtoCart.setVisibility(View.INVISIBLE);
-                ClickHereBtn.setVisibility(View.INVISIBLE);
-                final WebView UrlwebView = findViewById(R.id.UrlWebView);
-                UrlwebView.setVisibility(View.VISIBLE);
-                final String urlForWebViewAsText = "https://www.bajajfinserv.in/investments/fixed-deposit";
-                try {
+                MobileCore.trackAction("ClickHereBtn Targeting Button tapped", null);
+                Snackbar.make(view, "Creating Add to Cart Target request.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                // now over to Target
+                Map<String, String> profileParameters2 = new HashMap<>();
+                profileParameters2.put("usertype", "ETB"); // Does not NTB user Android offer display
+                //profileParameters2.put("usertype", "NTB"); // Iphone offer display
+                TargetParameters ProfileParametersTest = new TargetParameters.Builder().profileParameters(profileParameters2).build();
 
-                    URL url = new URL(urlForWebViewAsText); // I like to check my URLs
-                    appendVisitorInfoForURL(url);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            UrlwebView.loadUrl(urlForWebViewAsText);
+                TargetRequest targetRequest2 = new TargetRequest("target-global-mbox-urlwebview", ProfileParametersTest,"{\"url\":\"https://www.bajajfinserv.in/\"", new AdobeCallback<String>() {
+                    @Override
+                    public void call(String jsonResponse) {
+                        Snackbar.make(view, "Content received", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        // so this should be JSON content...
+                        try {
+                            final WebView UrlwebView = findViewById(R.id.UrlWebView);
+                            UrlwebView.setVisibility(View.VISIBLE);
+                            JSONObject targetJSONResponse = new JSONObject(jsonResponse);
+                            // replace content as needed
+
+                            final String urlForWebViewAsText = targetJSONResponse.getString("url");
+                            URL url = new URL(urlForWebViewAsText); // I like to check my URLs
+
+                            final TextView textView1 = findViewById(R.id.productname);
+                            final TextView textView2 = findViewById(R.id.productprice);
+                            final TextView textView3 = findViewById(R.id.productdescription);
+                            final ImageView imageView1 = findViewById(R.id.productimage);
+                            Button AddtoCart = findViewById(R.id.AddtoCart);
+                            Button ClickHereBtn = findViewById(R.id.ClickHereBtn);
+                            AddtoCart.setVisibility(View.INVISIBLE);
+                            ClickHereBtn.setVisibility(View.INVISIBLE);
+                            textView1.setVisibility(View.INVISIBLE);
+                            textView2.setVisibility(View.INVISIBLE);
+                            textView3.setVisibility(View.INVISIBLE);
+                            imageView1.setVisibility(View.INVISIBLE);
+
+                            if (urlForWebViewAsText.length() > 0) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        UrlwebView.loadUrl(urlForWebViewAsText);
+                                        Snackbar.make(view, "Content replaced", Snackbar.LENGTH_LONG)
+                                                .setAction("Action", null).show();
+                                    }
+                                });
+                            }
+                        } catch (JSONException e) {
+                            Snackbar.make(view, "Content from Target not valid JSON", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        } catch (MalformedURLException e) {
+                            Snackbar.make(view, "Target returned invalid URL", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
                         }
-                    });
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+                    }
+                });
+                List<TargetRequest> requests = new ArrayList<>();
+                requests.add(targetRequest2);
+                // prep done, now retrieve content
+                Snackbar.make(view, "Retrieving content from Target", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                Target.retrieveLocationContent(requests, null);
             }
         });
 
@@ -326,20 +359,5 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         MobileCore.lifecyclePause();
         super.onPause();
-    }
-
-
-    public void appendVisitorInfoForURL(URL url){
-        Identity.appendVisitorInfoForURL("https://demo.xerago.com/website/uae/adobe-webtag-training/softypinko/index.html", new AdobeCallback<String>() {
-        @Override
-        public void call(String urlWithAdobeVisitorInfo) {
-            //handle the new URL here
-            //For example, open the URL on the device browser
-            //
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(urlWithAdobeVisitorInfo));
-            startActivity(intent);
-            }
-        });
     }
 }

@@ -14,8 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".UrlWebView"
+            android:exported="false" />
+        <activity
             android:name=".TargetContentActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".SettingsActivity"
             android:parentActivityName=".MainActivity" />
@@ -32,7 +35,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -40,9 +42,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="show.xerago.com"
-                    android:pathPattern="/website/uae/adobe-webtag-training/" />
+                    android:pathPattern="/website/uae/adobe-webtag-training/"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
     </application>
