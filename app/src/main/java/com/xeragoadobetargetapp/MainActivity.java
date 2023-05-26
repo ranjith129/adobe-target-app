@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -30,6 +32,7 @@ import com.adobe.marketing.mobile.Target;
 import com.adobe.marketing.mobile.UserProfile;
 import com.adobe.marketing.mobile.TargetParameters;
 import com.adobe.marketing.mobile.TargetRequest;
+import com.adobe.marketing.mobile.VisitorID;
 import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Identity.syncIdentifier("mobile", "8973858955", VisitorID.AuthenticationState.AUTHENTICATED);
 
         //-------------- Add to Cart Button Target Activity code Start -------------------//
 
@@ -96,11 +100,11 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Creating Add to Cart Target request.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
                 Map<String, String> profileParameters1 = new HashMap<>();
-                profileParameters1.put("usertype", "ETB"); // Does not NTB user Android offer display
+                profileParameters1.put("last_clicked", "buttonA"); // Does not NTB user Android offer display
                 //profileParameters1.put("usertype", "NTB"); // Iphone offer display
                 TargetParameters ProfileParametersTest = new TargetParameters.Builder().profileParameters(profileParameters1).build();
 
-                TargetRequest targetRequest1 = new TargetRequest("target-global-mbox-applemobile", ProfileParametersTest,"{\"Offer\":[{\"productname\":\"Welcome\",\"productprice\":\"Yes\",\"productdescription\":\"Welcome\",\"productimage\":\"88888\"},{\"productname\":\"Welcome1\",\"productprice\":\"NO\",\"productdescription\":\"Welcome1\",\"productimage\":\"99999\"}]}", new AdobeCallback<String>() {
+                TargetRequest targetRequest1 = new TargetRequest("bfl_target_last_clicked", ProfileParametersTest,"{\"Offer\":[{\"featureId\":\"Welcome\",\"featurePromoText\":\"Yes\",\"status\":\"N\",\"featureIconLink\":\"88888\"},{\"featureId\":\"Welcome1\",\"featurePromoText\":\"NO\",\"status\":\"N\",\"featureIconLink\":\"99999\"}]}", new AdobeCallback<String>() {
                     /*      @Override
                            public void call(String content) {
                                if(content !=null && !content.isEmpty()){
@@ -127,13 +131,13 @@ public class MainActivity extends AppCompatActivity {
                                 Log.d("productObjectArrayResponse", String.valueOf(productObject));
                                 // replace content as needed
                                 final WebView UrlWebView = findViewById(R.id.UrlWebView);
-                                final String textForTextView1 = productObject.getString("productname");
+                                final String textForTextView1 = productObject.getString("featureId");
                                 final TextView textView1 = findViewById(R.id.productname);
-                                final String textForTextView2 = productObject.getString("productprice");
+                                final String textForTextView2 = productObject.getString("featurePromoText");
                                 final TextView textView2 = findViewById(R.id.productprice);
-                                final String textForTextView3 = productObject.getString("productdescription");
+                                final String textForTextView3 = productObject.getString("status");
                                 final TextView textView3 = findViewById(R.id.productdescription);
-                                final String ProductImagePath = productObject.getString("productimage");
+                                final String ProductImagePath = productObject.getString("featureIconLink");
                                 final ImageView imageView1 = findViewById(R.id.productimage);
 
                                 //  if (textForTextView1.length() > 0) {
@@ -268,21 +272,49 @@ public class MainActivity extends AppCompatActivity {
                 AddtoCart.setVisibility(View.INVISIBLE);
                 ClickHereBtn.setVisibility(View.INVISIBLE);
                 final WebView UrlwebView = findViewById(R.id.UrlWebView);
+                //CookieManager cookieManager = CookieManager.getInstance();
+                //cookieManager.setAcceptThirdPartyCookies(WebView, true);
                 UrlwebView.setVisibility(View.VISIBLE);
-                final String urlForWebViewAsText = "https://www.bajajfinserv.in/investments/fixed-deposit";
-                try {
+                UrlwebView.getSettings().setJavaScriptEnabled(true);
+                UrlwebView.getSettings().setLoadWithOverviewMode(true);
+                UrlwebView.getSettings().setUseWideViewPort(true);
+                WebSettings settings = UrlwebView.getSettings();
+                settings.setDomStorageEnabled(true);
+                Identity.appendVisitorInfoForURL("https://bflcodepush.bajajfinserv.in/9.0.01/dist/index.html", new AdobeCallback<String>() {
+                    //https://demo.xerago.com/website/uae/adobe-webtag-training/softypinko/index.html
+                    @Override
+                    public void call(final String urlWithAdobeVisitorInfo) {
+                        //handle the new URL here
+                        //For example, open the URL on the device browser
+                        //
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                UrlwebView.loadUrl(String.valueOf(Uri.parse(urlWithAdobeVisitorInfo)));
+                                Log.d("urlWithAdobeVisitorInfo:", String.valueOf(urlWithAdobeVisitorInfo));
+                                Log.d("mobile:", "8973858955");
+                            }
+                        });
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(urlWithAdobeVisitorInfo));
+                        startActivity(intent);
+                    }
+                });
 
-                    URL url = new URL(urlForWebViewAsText); // I like to check my URLs
-                    appendVisitorInfoForURL(url);
+
+               /* final String urlForWebViewAsText = "https://demo.xerago.com/website/uae/adobe-webtag-training/softypinko/index.html";
+                try {
+                   final URL url = new URL(urlForWebViewAsText); // I like to check my URLs
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             UrlwebView.loadUrl(urlForWebViewAsText);
                         }
                     });
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         });
 
@@ -328,18 +360,4 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-
-    public void appendVisitorInfoForURL(URL url){
-        Identity.appendVisitorInfoForURL("https://demo.xerago.com/website/uae/adobe-webtag-training/softypinko/index.html", new AdobeCallback<String>() {
-        @Override
-        public void call(String urlWithAdobeVisitorInfo) {
-            //handle the new URL here
-            //For example, open the URL on the device browser
-            //
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(urlWithAdobeVisitorInfo));
-            startActivity(intent);
-            }
-        });
-    }
 }

@@ -12,9 +12,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:hardwareAccelerated="true"
+        >
         <activity
-            android:name=".UrlWebView"
+            android:name=".UrlWebViewActivity"
             android:exported="false" />
         <activity
             android:name=".TargetContentActivity"
@@ -22,7 +24,7 @@
         <activity
             android:name=".SettingsActivity"
             android:parentActivityName=".MainActivity" />
-        <activity
+        <activity android:hardwareAccelerated="false"
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
