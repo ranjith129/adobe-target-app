@@ -1,5 +1,6 @@
 package com.xeragoadobetargetapp;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Identity.syncIdentifier("mobile", "8973858955", VisitorID.AuthenticationState.AUTHENTICATED);
-
+    
         //-------------- Add to Cart Button Target Activity code Start -------------------//
 
         Button AddtoCart = findViewById(R.id.AddtoCart);
@@ -280,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
                 UrlwebView.getSettings().setUseWideViewPort(true);
                 WebSettings settings = UrlwebView.getSettings();
                 settings.setDomStorageEnabled(true);
-                Identity.appendVisitorInfoForURL("https://bflcodepush.bajajfinserv.in/9.0.01/dist/index.html", new AdobeCallback<String>() {
+               /* Identity.appendVisitorInfoForURL("https://bflcodepush.bajajfinserv.in/9.0.01/dist/index.html", new AdobeCallback<String>() {
                     //https://demo.xerago.com/website/uae/adobe-webtag-training/softypinko/index.html
                     @Override
                     public void call(final String urlWithAdobeVisitorInfo) {
@@ -299,22 +300,26 @@ public class MainActivity extends AppCompatActivity {
                         intent.setData(Uri.parse(urlWithAdobeVisitorInfo));
                         startActivity(intent);
                     }
-                });
+                });*/
 
 
-               /* final String urlForWebViewAsText = "https://demo.xerago.com/website/uae/adobe-webtag-training/softypinko/index.html";
+                final String urlForWebViewAsText = "https://bflcodepush.bajajfinserv.in/9.0.01/dist/index.html";
                 try {
                    final URL url = new URL(urlForWebViewAsText); // I like to check my URLs
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             UrlwebView.loadUrl(urlForWebViewAsText);
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse(urlForWebViewAsText));
+                            startActivity(intent);
                         }
                     });
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
-                }*/
+                }
+
+
             }
         });
 
