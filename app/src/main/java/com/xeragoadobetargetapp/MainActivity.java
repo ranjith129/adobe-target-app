@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Identity.syncIdentifier("mobile", "8973858955", VisitorID.AuthenticationState.AUTHENTICATED);
+        Identity.syncIdentifier("mobile", "9698686857", VisitorID.AuthenticationState.AUTHENTICATED);
     
         //-------------- Add to Cart Button Target Activity code Start -------------------//
 
@@ -101,7 +101,9 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Creating Add to Cart Target request.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
                 Map<String, String> profileParameters1 = new HashMap<>();
-                profileParameters1.put("last_clicked", "buttonA"); // Does not NTB user Android offer display
+                profileParameters1.put("isHamburgerClickedWithin30Days", "1");
+                //profileParameters1.put("last_clicked", "buttonA");
+                // Does not NTB user Android offer display
                 //profileParameters1.put("usertype", "NTB"); // Iphone offer display
                 TargetParameters ProfileParametersTest = new TargetParameters.Builder().profileParameters(profileParameters1).build();
 
@@ -281,6 +283,9 @@ public class MainActivity extends AppCompatActivity {
                 UrlwebView.getSettings().setUseWideViewPort(true);
                 WebSettings settings = UrlwebView.getSettings();
                 settings.setDomStorageEnabled(true);
+
+                /* Appending Visitor ID start */
+
                /* Identity.appendVisitorInfoForURL("https://bflcodepush.bajajfinserv.in/9.0.01/dist/index.html", new AdobeCallback<String>() {
                     //https://demo.xerago.com/website/uae/adobe-webtag-training/softypinko/index.html
                     @Override
@@ -302,8 +307,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });*/
 
+                /* Appending Visitor ID End */
 
-                final String urlForWebViewAsText = "https://bflcodepush.bajajfinserv.in/9.0.01/dist/index.html";
+                /* Set Customer ID method start */
+
+                final String urlForWebViewAsText = "https://demo.xerago.com/website/uae/adobe-webtag-training/softypinko/index.html?mobile_number=9698686857";
                 try {
                    final URL url = new URL(urlForWebViewAsText); // I like to check my URLs
                     runOnUiThread(new Runnable() {
@@ -319,13 +327,10 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-
+                /* Set Customer ID method End */
             }
         });
-
 //-------------- Add to ClickHereBtn Button Target Activity code End -------------------//
-
-
     }
 
     @Override
